@@ -13,9 +13,24 @@ const server = http.createServer(app);
 const io = socketio(server);
 
 io.on("connection", socket => {
-  console.log("New Connection!!");
+  socket.on("join", ({ name, room }, callback) => {
+    const { error, user } = addUser({ id: socket.id, name, room });
 
-  socket.on("join", ({ name, room }, cb) => {});
+    if (error) return callback(error);
+
+    socket.emit("message", {
+      user: "admin",
+      text: `Hello, ${user.name}! You have entered the room: ${user.room}`
+    });
+
+    socket.broadcast
+      .to(user.room)
+      .emit("message", { user: "admin", text: `${user.name} has joined!` });
+
+    socket.join(user.room);
+
+    callback();
+  });
 
   socket.on("disconnect", () => {
     console.log("LEAVING NOW");
