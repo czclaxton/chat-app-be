@@ -13,6 +13,14 @@ const io = socketio(server);
 io.on("connection", socket => {
   console.log("New Connection!!");
 
+  socket.on("join", ({ name, room }, cb) => {
+    const error = true;
+
+    // if (error) {
+    //   cb({ error: "error" });
+    // }
+  });
+
   socket.on("disconnect", () => {
     console.log("LEAVING NOW");
   });
