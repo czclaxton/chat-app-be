@@ -29,6 +29,11 @@ io.on("connection", socket => {
 
     socket.join(user.room);
 
+    io.to(user.room).emit("roomData", {
+      room: user.room,
+      users: getUsersInRoom(user.room)
+    });
+
     callback();
   });
 
@@ -41,12 +46,20 @@ io.on("connection", socket => {
   });
 
   socket.on("disconnect", () => {
-    const user = removeUser(socket.id);
+    const disconnectedUser = removeUser(socket.id);
 
-    if (user) {
-      io.to(user.room).emit("message", {
+    // const updatedUsers = getUsersInRoom(disconnectedUser.room).filter(
+    //   onlineUser => onlineUser !== disconnectedUser
+    // );
+
+    if (disconnectedUser) {
+      io.to(disconnectedUser.room).emit("message", {
         user: "admin",
-        text: `${user.name} has left the room.`
+        text: `${disconnectedUser.name} has left the room.`
+      });
+      io.to(disconnectedUser.room).emit("roomData", {
+        room: disconnectedUser.room,
+        users: getUsersInRoom(disconnectedUser.room)
       });
     }
   });
