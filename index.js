@@ -18,6 +18,7 @@ io.on("connection", socket => {
 
     if (error) return callback(error);
 
+    // message whenever a user enters a new room
     socket.emit("message", {
       user: "admin",
       text: `Hello, ${user.name}! You have entered the room: ${user.room}`
